@@ -1,0 +1,8 @@
+# .NET build output
+bin/
+obj/
+dist/
+
+# local test artifacts
+*.png
+flaui-screenshot-*.png

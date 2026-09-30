@@ -1,0 +1,64 @@
+{
+  "skill": "flaui",
+  "description": "End-to-end checks for the flaui skill. Each eval is a prompt given to an agent with the skill enabled, plus the observable outcome that must hold on a Windows machine.",
+  "evals": [
+    {
+      "id": "calc-dump-foundation",
+      "app": "Calculator",
+      "prompt": "I have a FlaUI test that fails to find the Equals button in the Windows Calculator. Find the correct selector for it.",
+      "expect": [
+        "launches Calculator (calc.exe) and waits for the window",
+        "runs `flaui dump --window Calculator` and greps the tree",
+        "reports an AutomationId (`equalButton`) as the stable selector"
+      ]
+    },
+    {
+      "id": "calc-drive-and-verify",
+      "app": "Calculator",
+      "prompt": "Using flaui, compute 7 + 8 in Calculator and show me the displayed result.",
+      "expect": [
+        "clicks num7Button, plusButton, num8Button, equalButton",
+        "re-dumps or finds CalculatorResults",
+        "reports the display text contains '15'"
+      ]
+    },
+    {
+      "id": "calc-screenshot",
+      "app": "Calculator",
+      "prompt": "Capture the Calculator window to a PNG and tell me where it is.",
+      "expect": [
+        "runs `flaui screenshot --window Calculator --out <path>`",
+        "reports the written absolute path"
+      ]
+    },
+    {
+      "id": "notepad-author-test",
+      "app": "Notepad",
+      "prompt": "Write a FlaUI NUnit test that opens Notepad, types 'hello world' into the editor, and asserts the editor contains that text.",
+      "expect": [
+        "discovers the editor element via flaui (Document/Edit; class RichEditD2DPT on Win11)",
+        "uses FlaUI FindFirstDescendant + Retry, not Thread.Sleep",
+        "asserts on the editor's value/text"
+      ]
+    },
+    {
+      "id": "debug-broken-selector",
+      "app": "Calculator",
+      "prompt": "This FlaUI test used to pass but now fails: window.FindFirstDescendant(cf => cf.ByName(\"Seven\")).AsButton().Invoke(). Why, and how do I fix it?",
+      "expect": [
+        "reproduces with flaui and finds the button by automationId num7Button",
+        "explains the Name is localized/brittle",
+        "recommends ByAutomationId(\"num7Button\")"
+      ]
+    },
+    {
+      "id": "timing-flakiness",
+      "app": "Calculator",
+      "prompt": "My test sometimes fails with 'element not found' right after launch. Using flaui, show whether this is a timing issue and give the C# fix.",
+      "expect": [
+        "uses `flaui wait-for` to show the element exists after a delay",
+        "recommends Retry.WhileNull / WaitUntilClickable instead of Thread.Sleep"
+      ]
+    }
+  ]
+}
